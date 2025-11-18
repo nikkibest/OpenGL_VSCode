@@ -8,7 +8,11 @@
 #endif
 
 #ifdef GLCORE_ENABLE_ASSERTS
-	#define GLCORE_ASSERT(x, ...) { if(!(x)) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#ifdef _WIN32
+		#define GLCORE_ASSERT(x, ...) { if(!(x)) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#else
+		#define GLCORE_ASSERT(x, ...) { if(!(x)) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __builtin_trap(); } }
+	#endif
 #else
 	#define GLCORE_ASSERT(x, ...)
 #endif

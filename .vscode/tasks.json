@@ -1,0 +1,72 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: Configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B",
+                "${workspaceFolder}/build",
+                "-S",
+                "${workspaceFolder}",
+                "-DCMAKE_BUILD_TYPE=Debug"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "CMake: Build",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/build",
+                "--config",
+                "Debug"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "CMake: Configure"
+        },
+        {
+            "label": "CMake: Clean",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/build",
+                "--target",
+                "clean"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run OpenGL-Sandbox",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/bin/OpenGL-Sandbox",
+            "problemMatcher": [],
+            "group": "test",
+            "dependsOn": "CMake: Build"
+        },
+        {
+            "label": "Run OpenGL-Examples",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/bin/OpenGL-Examples",
+            "options": {
+                "cwd": "${workspaceFolder}/build/bin"
+            },
+            "problemMatcher": [],
+            "group": "test",
+            "dependsOn": "CMake: Build"
+        }
+    ]
+}

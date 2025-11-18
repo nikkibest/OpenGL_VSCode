@@ -1,5 +1,5 @@
 #include "glpch.h"
-#include "WindowsWindow.h"
+#include "LinuxWindow.h"
 
 #include "GLCore/Events/ApplicationEvent.h"
 #include "GLCore/Events/MouseEvent.h"
@@ -14,27 +14,37 @@ namespace GLCore {
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
+		// Silently ignore known Wayland limitations that are non-fatal
+		std::string desc = description;
+		if (desc.find("Wayland") != std::string::npos && 
+		    desc.find("window position") != std::string::npos)
+		{
+			// This is expected on Wayland - window position is not available
+			// Silently ignore this limitation
+			return;
+		}
+		
 		LOG_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	#ifdef GLCORE_PLATFORM_WINDOWS
+	#ifndef GLCORE_PLATFORM_WINDOWS
 	Window* Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return new LinuxWindow(props);
 	}
 	#endif
 
-	WindowsWindow::WindowsWindow(const WindowProps& props)
+	LinuxWindow::LinuxWindow(const WindowProps& props)
 	{
 		Init(props);
 	}
 
-	WindowsWindow::~WindowsWindow()
+	LinuxWindow::~LinuxWindow()
 	{
 		Shutdown();
 	}
 
-	void WindowsWindow::Init(const WindowProps& props)
+	void LinuxWindow::Init(const WindowProps& props)
 	{
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
@@ -153,18 +163,18 @@ namespace GLCore {
 		});
 	}
 
-	void WindowsWindow::Shutdown()
+	void LinuxWindow::Shutdown()
 	{
 		glfwDestroyWindow(m_Window);
 	}
 
-	void WindowsWindow::OnUpdate()
+	void LinuxWindow::OnUpdate()
 	{
 		glfwPollEvents();
 		glfwSwapBuffers(m_Window);
 	}
 
-	void WindowsWindow::SetVSync(bool enabled)
+	void LinuxWindow::SetVSync(bool enabled)
 	{
 		if (enabled)
 			glfwSwapInterval(1);
@@ -174,7 +184,7 @@ namespace GLCore {
 		m_Data.VSync = enabled;
 	}
 
-	bool WindowsWindow::IsVSync() const
+	bool LinuxWindow::IsVSync() const
 	{
 		return m_Data.VSync;
 	}
